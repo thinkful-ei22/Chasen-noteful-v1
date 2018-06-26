@@ -9,10 +9,13 @@ console.log('Hello Noteful!');
 
 const express = require('express');
 const { PORT } = require('./config');
+const logger = require('./middleware/logger');
 
 const app = express();
 
+
 app.use(express.static('public'));
+app.use(logger);
 
 app.get('/api/notes', (req, res) => {
   const queryTerm = req.query.searchTerm;
