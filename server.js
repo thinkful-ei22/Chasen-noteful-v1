@@ -19,14 +19,25 @@ const app = express();
 app.use(express.static('public'));
 app.use(logger);
 
-app.get('/api/notes', (req, res) => {
-  const queryTerm = req.query.searchTerm;
-  if (queryTerm){
-    const filteredNotes = data.filter(item => item.title.includes(queryTerm));
-    res.json(filteredNotes);
-  }else{
-    res.json(data);
-  }
+// app.get('/api/notes', (req, res) => {
+//   const queryTerm = req.query.searchTerm;
+//   if (queryTerm){
+//     const filteredNotes = data.filter(item => item.title.includes(queryTerm));
+//     res.json(filteredNotes);
+//   }else{
+//     res.json(data);
+//   }
+// });
+
+app.get('/api/notes', (req, res, next) => {
+  const { searchTerm } = req.query;
+
+  notes.filter(searchTerm, (err, list) => {
+    if (err) {
+      return next(err); // goes to error handler
+    }
+    res.json(list); // responds with filtered array
+  });
 });
 
 app.get('/api/notes/:id', (req, res) =>{
