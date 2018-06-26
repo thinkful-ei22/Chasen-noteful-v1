@@ -5,7 +5,7 @@ const api = {
 
   search: function (query, callback) {
     $.ajax({
-      type: 'GET',
+      method: 'GET',
       url: '/api/notes/',
       dataType: 'json',
       data: query,
@@ -20,5 +20,17 @@ const api = {
       url: `/api/notes/${id}`,
       success: callback
     });
+  },
+
+  update: function(id, obj, callback) {
+    $.ajax({
+      type: 'PUT',
+      url: `/api/notes/${id}`,
+      contentType: 'application/json',
+      dataType: 'json',
+      data: JSON.stringify(obj),
+      success: callback
+    });
   }
+
 };
