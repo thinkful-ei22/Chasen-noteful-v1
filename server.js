@@ -10,10 +10,15 @@ console.log('Hello Noteful!');
 // INSERT EXPRESS APP CODE HERE...
 
 const express = require('express');
+const morgan = require('morgan');
+
 const { PORT } = require('./config');
 const logger = require('./middleware/logger');
 
 const app = express();
+
+//log all requests///
+app.use(morgan('dev'));
 
 app.use(logger);
 app.use(express.static('public'));
