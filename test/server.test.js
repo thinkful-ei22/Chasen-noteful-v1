@@ -96,6 +96,7 @@ describe('Notefull', function(){
   });
 
   describe('GET /api/notes/:id', function(){
+
     it('should return correct note object with id, title and content for a given id', function(){
       return chai.request(app)
         .get('/api/notes/1000')
@@ -114,9 +115,96 @@ describe('Notefull', function(){
           expect(res).to.have.status(404);
         })
         .catch(err => err.response);
-    });    
+    });  
+
   });
 
+  describe('POST /api/notes', function(){
 
+    it('should create and return a new item with location header when provided valid data', function(){
+      const newItem = {title: 'Another article about cats', 'content': 'lorem'};
+      return chai.request(app)
+        .post('/api/notes')
+        .send(newItem)
+        .then(function (res) {
+          expect(res).to.have.status(201);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body).to.include.keys('id', 'title', 'content');
+          expect(res).to.have.header('location');
+          expect(res.body.title).to.equal(newItem.title);
+          expect(res.body.content).to.equal(newItem.content);
+        });
+    });
+    it('should return an object with a message property "Missing title in request body" when missing "title" field', function(){
+      const newItem = {content: 'lorem'};
+      return chai.request(app)
+        .post('/api/notes')
+        .send(newItem)
+        .catch(err => err.response)
+        .then(function(res){
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body.message).to.equal('Missing `title` in request body');
+        });
+    });
+  
+  });
 
+  describe('PUT /api/notes/:id', function(){
+
+    it('should update and return a note object when given valid data', function(){
+      const updateItem = {title: 'Updated article about cats', 'content': 'lorem'};
+      return chai.request(app)
+        .put('/api/notes/1000')
+        .send(updateItem)
+        .then(function (res) {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body).to.include.keys('id', 'title', 'content');
+          expect(res.body.id).to.equal(1000);
+          expect(res.body.title).to.equal(updateItem.title);
+          expect(res.body.content).to.equal(updateItem.content);
+        });
+    });
+    it('should respond with a 404 for an invalid id (/api/notes/DOESNOTEXIST)', function(){
+      const updateItem = {title: 'Updated article about cats', 'content': 'lorem'};
+      return chai.request(app)
+        .put('/api/notes/DOESNOTEXIST')
+        .send(updateItem)
+        .catch(err => err.response)
+        .then(function(res){
+          expect(res).to.have.status(404);
+        });
+    });
+    it('should return an object with a message property "Missing title in request body" when missing "title" field', function(){
+      const updateItem = { title: null };
+      return chai.request(app)
+        .put('/api/notes/1001')
+        .send(updateItem)
+        .catch(err => err.response)
+        .then(function (res) {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body.message).to.equal('Missing `title` in request body');
+        });
+        
+    });
+
+  });
+
+  describe('DELETE  /api/notes/:id', function () {
+
+    it('should delete an item by id', function () {
+      return chai.request(app)
+        .delete('/api/notes/1000')
+        .then(function (res) {
+          expect(res).to.have.status(204);
+        });
+    });
+
+  });
 });
